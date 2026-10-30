@@ -1,0 +1,625 @@
+{
+  "name": "Batalla Pokémon",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Form Trigger",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "pokemon1",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "pikachu"
+                  },
+                  {
+                    "option": "bulbasaur"
+                  },
+                  {
+                    "option": "squirtle"
+                  },
+                  {
+                    "option": "eevee"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "pokemon2",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "charmander"
+                  },
+                  {
+                    "option": "bulbasaur"
+                  },
+                  {
+                    "option": "squirtle"
+                  },
+                  {
+                    "option": "eevee"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "estilo",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "epico"
+                  },
+                  {
+                    "option": "gracioso"
+                  },
+                  {
+                    "option": "dramatico"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4fb7cc99-8ae4-419d-a274-13c21ed9a8a7",
+      "name": "Form Trgigger",
+      "webhookId": "392733f8-2744-413c-944e-361bc3264a41"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36043eac-f152-45da-98b1-12d86a91998d",
+              "name": "pokemon1",
+              "value": "={{ ($json.pokemon1 || '').trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "e7eacd8a-202b-4df7-848d-d00380c1a7f1",
+              "name": "pokemon2",
+              "value": "={{ ($json.pokemon2 || '').trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "b121362b-56c8-4c60-9b60-eca39809f235",
+              "name": "estilo",
+              "value": "={{ $json.estilo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2d7c3dee-c270-4940-90a2-6f8bb10f0d7f",
+      "name": "Preparar datos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "297ef0e0-e85c-422a-b6ba-ba9be60e14ce",
+              "leftValue": "={{ $json.pokemon1 !== $json.pokemon2 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4aabd068-a321-433c-a73c-047681a514d2",
+      "name": "¿Pokémon diferentes?"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Error: Pokémon Iguales",
+        "completionMessage": "elegir Pokémon distintos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        400,
+        288
+      ],
+      "id": "a460029d-f22d-4a4a-bce0-136abb5aea75",
+      "name": "Form Ending",
+      "webhookId": "ecd174d5-7594-47af-90bd-7ffb93dc429e"
+    },
+    {
+      "parameters": {
+        "url": "=https://pokeapi.co/api/v2/pokemon/{{ $('Preparar datos').first().json.pokemon1 }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "0d9506df-bacc-45fa-94e1-3b0ef641b04c",
+      "name": "Consultar Pokémon 1"
+    },
+    {
+      "parameters": {
+        "url": "=https://pokeapi.co/api/v2/pokemon/{{ $('Preparar datos').first().json.pokemon2 }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        48
+      ],
+      "id": "6c39e370-4ace-4a97-974d-673a0652fa4e",
+      "name": "Consultar Pokémon 2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1330f128-e11e-4710-9ac8-64c4d9632b91",
+              "name": "pokemonA",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "cb9e3af0-eeb0-41f9-a12b-ce90d89b885b",
+      "name": "Guardar Pokémon A"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "41214e93-3b02-4113-a556-ef788e2b01f8",
+              "name": "pokemonB",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        912,
+        144
+      ],
+      "id": "c7cbe95d-7178-4cad-bf45-de446e82cd3c",
+      "name": "Consultar Pokémon B"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1104,
+        -16
+      ],
+      "id": "52251c91-8830-4b47-86bf-bd9baab50a68",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.ganador }}",
+                    "rightValue": "={{ $json.pokemon1 }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a5be22a3-ac8d-4e38-b566-1318ae52a3d7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Gana Pokémon 1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "9479a7bf-16bb-4d21-ae79-65b4af88e2b9",
+                    "leftValue": "={{ $json.ganador }}",
+                    "rightValue": "={{ $json.pokemon2 }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Gana Pokémon 2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "ff503a0e-b555-419c-9cec-56219953c185",
+                    "leftValue": "={{ $json.ganador }}",
+                    "rightValue": "empate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Empate"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        1552,
+        -16
+      ],
+      "id": "24fbf7bb-6b28-45aa-a6cc-6990d747c217",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e4aebefe-a37e-4352-aeb0-84579e439554",
+              "name": "prompt",
+              "value": "={{ 'Narra una batalla Pokémon en español. ' + 'Pokémon 1: ' + $json.pokemon1 + ', con poder ' + $json.poder1 + '. ' + 'Pokémon 2: ' + $json.pokemon2 + ', con poder ' + $json.poder2 + '. ' + ($json.ganador === 'empate' ? 'Resultado: empate. ' : 'El ganador es: ' + $json.ganador + '. ') + 'Estilo de narración: ' + $json.estilo + '. ' + 'Usa entre 100 y 150 palabras. ' + ($json.ganador === 'empate' ? 'No inventes un ganador: la batalla debe terminar en empate.' : 'No cambies el ganador: la batalla debe terminar con la victoria de ' + $json.ganador + '.') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1776,
+        -128
+      ],
+      "id": "e6ff4977-a073-4a20-b33c-4da8ee9b41de",
+      "name": "Preparar prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'openai/gpt-oss-120b',\n  temperature: 0.8,\n  messages: [\n    {\n      role: 'system',\n      content: 'Eres un narrador divertido de batallas Pokémon. Respeta siempre el ganador indicado.'\n    },\n    {\n      role: 'user',\n      content: $json.prompt\n    }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2000,
+        -128
+      ],
+      "id": "69325121-fff3-447e-9980-60af4970d17f",
+      "name": "Groq: narrar batalla",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "NdVTKozh4hlEIcLb",
+          "name": "Bearer Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "={{ $json.titulo }}",
+        "completionMessage": "={{ $json.mensajeFinal }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        2448,
+        -128
+      ],
+      "id": "79d5f33a-1491-4877-9d9f-be4c2cfde807",
+      "name": "Mostrar resultado",
+      "webhookId": "57dc9f83-2985-4673-b657-316e5611cfba"
+    },
+    {
+      "parameters": {
+        "jsCode": "const respuesta = $input.first().json;\nconst batalla = $('Calcular batalla').first().json;\n\nconst narracion = respuesta.choices?.[0]?.message?.content\n  || 'No se pudo generar la narración de la batalla.';\n\nconst titulo = batalla.ganador === 'empate'\n  ? 'EMPATE'\n  : 'GANADOR: ' + batalla.ganador.toUpperCase();\n\nconst mensajeFinal =\n  batalla.pokemon1 + ': poder ' + batalla.poder1 + '\\n' +\n  batalla.pokemon2 + ': poder ' + batalla.poder2 + '\\n\\n' +\n  narracion;\n\nreturn [{\n  json: {\n    ...batalla,\n    narracion,\n    titulo,\n    mensajeFinal\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2224,
+        -128
+      ],
+      "id": "30908065-62b1-4d23-b0a2-49c4b6407b19",
+      "name": "Extraer narracion"
+    },
+    {
+      "parameters": {
+        "jsCode": "const datos = $input.first().json;\n\nconst pokemon1 = datos.pokemonA;\nconst pokemon2 = datos.pokemonB;\n\n// Devuelve el valor base de una estadística, por ejemplo 'attack'\nfunction obtenerStat(pokemon, nombre) {\n  const stat = pokemon.stats.find(s => s.stat.name === nombre);\n  return stat ? stat.base_stat : undefined;\n}\n\nfunction calcularPoder(pokemon) {\n  const ataque = obtenerStat(pokemon, 'attack');\n  const defensa = obtenerStat(pokemon, 'defense');\n  const velocidad = obtenerStat(pokemon, 'speed');\n\n  return ataque * 2 + defensa + velocidad;\n}\n\nconst poder1 = calcularPoder(pokemon1);\nconst poder2 = calcularPoder(pokemon2);\n\nlet ganador = 'empate';\n\nif (poder1 > poder2) {\n  ganador = pokemon1.name;\n} else if (poder2 > poder1) {\n  ganador = pokemon2.name;\n}\n\nreturn [{\n  json: {\n    pokemon1: pokemon1.name,\n    pokemon2: pokemon2.name,\n    poder1,\n    poder2,\n    ganador,\n    estilo: $('Preparar datos').first().json.estilo\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        -16
+      ],
+      "id": "c2565a1a-be81-4b2f-ac58-07cc5c9e26fc",
+      "name": "Calcular batalla"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Form Trgigger": {
+      "main": [
+        [
+          {
+            "node": "Preparar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar datos": {
+      "main": [
+        [
+          {
+            "node": "¿Pokémon diferentes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Pokémon diferentes?": {
+      "main": [
+        [
+          {
+            "node": "Consultar Pokémon 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Consultar Pokémon 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form Ending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Pokémon 2": {
+      "main": [
+        [
+          {
+            "node": "Consultar Pokémon B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Pokémon 1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Pokémon A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Pokémon B": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Guardar Pokémon A": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Calcular batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Preparar prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar prompt": {
+      "main": [
+        [
+          {
+            "node": "Groq: narrar batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq: narrar batalla": {
+      "main": [
+        [
+          {
+            "node": "Extraer narracion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer narracion": {
+      "main": [
+        [
+          {
+            "node": "Mostrar resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular batalla": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "922b991c-1ac1-4d12-9d19-4bb5a29081b3",
+  "meta": {
+    "instanceId": "aec51c9de0f38f70d227bb79340b4fa6763f78dfd948de7ce5dda4b41ef37647"
+  },
+  "nodeGroups": [],
+  "id": "HXmwptHvmhZyCaYV",
+  "tags": []
+}
