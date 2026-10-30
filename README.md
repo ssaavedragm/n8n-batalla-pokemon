@@ -4,29 +4,65 @@ Workflow de [n8n](https://n8n.io) que enfrenta a dos Pokémon, calcula quién ga
 
 ## ¿Cómo funciona?
 
-1. El usuario abre un formulario, elige dos Pokémon y un estilo de narración.
-2. El flujo consulta la [PokéAPI](https://pokeapi.co) para obtener las estadísticas de cada Pokémon.
-3. Calcula el poder de cada uno con la fórmula:
+1. El usuario abre un formulario y elige dos Pokémon y un estilo de narración.
+2. El flujo valida que los dos Pokémon sean diferentes.
+3. Consulta la [PokéAPI](https://pokeapi.co) para obtener las estadísticas de cada uno.
+4. Calcula el poder de cada Pokémon con la fórmula:
 
    ```
    poder = ataque × 2 + defensa + velocidad
    ```
 
-4. Decide el ganador (o empate si los poderes son iguales).
-5. Envía un prompt a la API de Groq para que narre la batalla en 100 a 150 palabras, respetando el resultado.
-6. Muestra al usuario una pantalla final con el ganador y la narración.
+5. Decide el ganador, o empate si los poderes son iguales.
+6. Envía un prompt a la API de Groq para que narre la batalla en 100 a 150 palabras, respetando el resultado.
+7. Muestra al usuario una pantalla final con el ganador, los poderes y la narración.
+
+## Diagrama del flujo
+
+```mermaid
+flowchart LR
+    A[Form Trigger] --> B[Preparar datos]
+    B --> C{¿Pokémon diferentes?}
+    C -- No --> D[Form Ending: error]
+    C -- Sí --> E[Consultar Pokémon 1]
+    C -- Sí --> F[Consultar Pokémon 2]
+    E --> G[Guardar Pokémon A]
+    F --> H[Guardar Pokémon B]
+    G --> I[Merge]
+    H --> I
+    I --> J[Calcular batalla]
+    J --> K[Switch]
+    K --> L[Preparar prompt]
+    L --> M[Groq: narrar batalla]
+    M --> N[Extraer narración]
+    N --> O[Mostrar resultado]
+```
 
 ## Nodos del workflow
 
 | Nodo | Tipo | Función |
 |------|------|---------|
-| On form submission | Form Trigger | Recibe los Pokémon y el estilo de narración |
-| Consulta a PokéAPI | HTTP Request | Obtiene las estadísticas de cada Pokémon |
+| Form Trigger | Form Trigger | Formulario con tres listas: `pokemon1`, `pokemon2` y `estilo` |
+| Preparar datos | Edit Fields | Limpia los nombres (quita espacios y pasa a minúsculas) |
+| ¿Pokémon diferentes? | If | Verifica que no se elija el mismo Pokémon dos veces |
+| Form Ending | Form | Muestra un mensaje de error si los Pokémon son iguales |
+| Consultar Pokémon 1 / 2 | HTTP Request | Obtienen los datos de cada Pokémon desde la PokéAPI |
+| Guardar Pokémon A / B | Edit Fields | Guardan cada respuesta como `pokemonA` y `pokemonB` |
+| Merge | Merge | Junta los dos Pokémon en un solo item (por posición) |
 | Calcular batalla | Code | Calcula el poder de cada Pokémon y define el ganador |
+| Switch | Switch | Clasifica el resultado: gana Pokémon 1, gana Pokémon 2 o empate |
 | Preparar prompt | Edit Fields | Arma las instrucciones para la IA |
-| Llamada a Groq | HTTP Request | Genera la narración de la batalla |
+| Groq: narrar batalla | HTTP Request | Llama a la API de Groq (modelo `openai/gpt-oss-120b`) |
 | Extraer narración | Code | Obtiene el texto de la IA y arma el título y el mensaje final |
 | Mostrar resultado | Form (Form Ending) | Muestra el resultado al usuario |
+
+## Opciones del formulario
+
+| Campo | Opciones |
+|-------|----------|
+| `pokemon1` | pikachu, bulbasaur, squirtle, eevee |
+| `pokemon2` | charmander, bulbasaur, squirtle, eevee |
+| `estilo` | epico, gracioso, dramatico |
 
 ## Requisitos
 
@@ -35,27 +71,32 @@ Workflow de [n8n](https://n8n.io) que enfrenta a dos Pokémon, calcula quién ga
 
 ## Instalación
 
-1. Descarga el archivo `.json` de este repositorio.
+1. Descarga el archivo `Batalla Pokémon.json` de este repositorio.
 2. En n8n, abre el menú **⋯** → **Import from File** y selecciona el archivo.
-3. Crea tu credencial de Groq:
-   - Abre el nodo que llama a Groq.
-   - En **Authentication**, elige **Generic Credential Type** → **Bearer Auth**.
+3. Configura tu credencial de Groq:
+   - Abre el nodo **Groq: narrar batalla**.
+   - En **Authentication** debe estar **Generic Credential Type** → **Bearer Auth**.
    - Crea una credencial nueva y pega tu API key en **Bearer Token** (solo la key, sin escribir `Bearer`).
 4. Guarda el workflow y actívalo con el interruptor **Active**.
-5. Abre el nodo **On form submission**, copia la **Production URL** y ábrela en el navegador.
+5. Abre el nodo **Form Trigger**, copia la **Production URL** y ábrela en el navegador.
 
 ## Uso
 
-Escribe el nombre de dos Pokémon en inglés y en minúsculas (por ejemplo `pikachu` y `bulbasaur`), elige un estilo de narración y envía el formulario. En unos segundos verás quién ganó y la narración de la batalla.
+Elige un Pokémon en cada lista y un estilo de narración, y envía el formulario. En unos segundos verás quién ganó y la narración de la batalla. Si eliges el mismo Pokémon en las dos listas, el formulario te pedirá elegir Pokémon distintos.
 
 ### Ejemplo
 
 | Pokémon | Ataque | Defensa | Velocidad | Poder |
 |---------|--------|---------|-----------|-------|
 | Pikachu | 55 | 40 | 90 | **240** |
-| Bulbasaur | 49 | 49 | 45 | **192** |
+| Charmander | 52 | 43 | 65 | **212** |
 
 **Resultado:** GANADOR: PIKACHU
+
+## Manejo de errores
+
+- Si Groq falla, el nodo **Groq: narrar batalla** continúa el flujo (`Continue on error`) y la pantalla final muestra un mensaje de respaldo en lugar de la narración.
+- Si los dos Pokémon son iguales, el flujo se detiene antes de consultar la PokéAPI y muestra un aviso.
 
 ## Solución de problemas
 
@@ -65,7 +106,7 @@ Escribe el nombre de dos Pokémon en inglés y en minúsculas (por ejemplo `pika
 
 ## Seguridad
 
-El archivo exportado **no incluye credenciales**. Cada persona que use este workflow debe configurar su propia API key de Groq. Nunca escribas tu key directamente en un nodo ni la subas al repositorio.
+El archivo exportado **no incluye credenciales**, solo una referencia a ellas. Cada persona que use este workflow debe configurar su propia API key de Groq. Nunca escribas tu key directamente en un nodo ni la subas al repositorio.
 
 ## Tecnologías
 
