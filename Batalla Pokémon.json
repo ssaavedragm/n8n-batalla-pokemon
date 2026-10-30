@@ -3,82 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "formTitle": "Form Trigger",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "pokemon1",
-              "fieldType": "dropdown",
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "pikachu"
-                  },
-                  {
-                    "option": "bulbasaur"
-                  },
-                  {
-                    "option": "squirtle"
-                  },
-                  {
-                    "option": "eevee"
-                  }
-                ]
-              }
-            },
-            {
-              "fieldLabel": "pokemon2",
-              "fieldType": "dropdown",
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "charmander"
-                  },
-                  {
-                    "option": "bulbasaur"
-                  },
-                  {
-                    "option": "squirtle"
-                  },
-                  {
-                    "option": "eevee"
-                  }
-                ]
-              }
-            },
-            {
-              "fieldLabel": "estilo",
-              "fieldType": "dropdown",
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "epico"
-                  },
-                  {
-                    "option": "gracioso"
-                  },
-                  {
-                    "option": "dramatico"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.6,
-      "position": [
-        0,
-        0
-      ],
-      "id": "4fb7cc99-8ae4-419d-a274-13c21ed9a8a7",
-      "name": "Form Trgigger",
-      "webhookId": "392733f8-2744-413c-944e-361bc3264a41"
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
@@ -213,29 +137,6 @@
       ],
       "id": "cb9e3af0-eeb0-41f9-a12b-ce90d89b885b",
       "name": "Guardar Pokémon A"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "41214e93-3b02-4113-a556-ef788e2b01f8",
-              "name": "pokemonB",
-              "value": "={{ $json }}",
-              "type": "object"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.5,
-      "position": [
-        912,
-        144
-      ],
-      "id": "c7cbe95d-7178-4cad-bf45-de446e82cd3c",
-      "name": "Consultar Pokémon B"
     },
     {
       "parameters": {
@@ -436,21 +337,109 @@
       ],
       "id": "c2565a1a-be81-4b2f-ac58-07cc5c9e26fc",
       "name": "Calcular batalla"
+    },
+    {
+      "parameters": {
+        "formTitle": "Batalla Pokemon",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "pokemon1",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "pikachu"
+                  },
+                  {
+                    "option": "bulbasaur"
+                  },
+                  {
+                    "option": "squirtle"
+                  },
+                  {
+                    "option": "eevee"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "pokemon2",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "charmander"
+                  },
+                  {
+                    "option": "bulbasaur"
+                  },
+                  {
+                    "option": "squirtle"
+                  },
+                  {
+                    "option": "eevee"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "estilo",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "epico"
+                  },
+                  {
+                    "option": "gracioso"
+                  },
+                  {
+                    "option": "dramatico"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4fb7cc99-8ae4-419d-a274-13c21ed9a8a7",
+      "name": "Form Trigger",
+      "webhookId": "392733f8-2744-413c-944e-361bc3264a41"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "41214e93-3b02-4113-a556-ef788e2b01f8",
+              "name": "pokemonB",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        912,
+        144
+      ],
+      "id": "c7cbe95d-7178-4cad-bf45-de446e82cd3c",
+      "name": "Guardar Pokémon B"
     }
   ],
   "pinData": {},
   "connections": {
-    "Form Trgigger": {
-      "main": [
-        [
-          {
-            "node": "Preparar datos",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Preparar datos": {
       "main": [
         [
@@ -489,7 +478,7 @@
       "main": [
         [
           {
-            "node": "Consultar Pokémon B",
+            "node": "Guardar Pokémon B",
             "type": "main",
             "index": 0
           }
@@ -503,17 +492,6 @@
             "node": "Guardar Pokémon A",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Consultar Pokémon B": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -608,6 +586,28 @@
           }
         ]
       ]
+    },
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Preparar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Pokémon B": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -615,7 +615,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "922b991c-1ac1-4d12-9d19-4bb5a29081b3",
+  "versionId": "fd836ab0-8a0a-4513-96a4-4fba2c95502b",
   "meta": {
     "instanceId": "aec51c9de0f38f70d227bb79340b4fa6763f78dfd948de7ce5dda4b41ef37647"
   },
